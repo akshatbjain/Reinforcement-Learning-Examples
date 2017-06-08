@@ -3,10 +3,16 @@ import World
 import threading
 import time
 
+start_time = time.time()
 discount = 0.3
 actions = World.actions
 states = []
 Q = {}
+episode_count = 1
+previous_score = 0
+same_score_counter = 0
+finished_learning = False
+
 for i in range(World.x):
     for j in range(World.y):
         states.append((i, j))
@@ -39,6 +45,7 @@ def do_action(action):
         return
     s2 = World.player
     r += World.score
+
     return s, action, r, s2
 
 
@@ -59,11 +66,12 @@ def inc_Q(s, a, alpha, inc):
 
 
 def run():
-    global discount
+    global discount, finished_learning, episode_count, start_time, previous_score, same_score_counter
+
     time.sleep(1)
     alpha = 1
     t = 1
-    while True:
+    while not finished_learning:
         # Pick the right action
         s = World.player
         max_act, max_val = max_Q(s)
@@ -76,6 +84,15 @@ def run():
         # Check if the game has restarted
         t += 1.0
         if World.has_restarted():
+            episode_count += 1
+            if(previous_score == World.score):
+                same_score_counter += 1
+                if(same_score_counter == 10):
+                    finished_learning = True
+            else:
+                previous_score = World.score
+                same_score_counter = 0
+
             World.restart_game()
             time.sleep(0.01)
             t = 1.0
@@ -85,6 +102,10 @@ def run():
 
         # MODIFY THIS SLEEP IF THE GAME IS GOING TOO FAST.
         time.sleep(0.1)
+    print("Agent Finished Learning!")
+    print("Episodes taken: ", episode_count)
+    print("Time taken: %s seconds" % (time.time() - start_time))
+    print("Close the window to end the program!")
 
 
 t = threading.Thread(target=run)
