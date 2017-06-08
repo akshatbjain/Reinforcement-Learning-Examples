@@ -1,24 +1,66 @@
 __author__ = 'philippe'
 from Tkinter import *
+from random import randint
+
 master = Tk()
 
 triangle_size = 0.1
 cell_score_min = -0.2
 cell_score_max = 0.2
 Width = 100
-(x, y) = (5, 5)
+(x, y) = (10, 10)
 actions = ["up", "down", "left", "right"]
 
 board = Canvas(master, width=x*Width, height=y*Width)
-player = (0, y-1)
 score = 1
 restart = False
 walk_reward = -0.04
 
-walls = [(1, 1), (1, 2), (2, 1), (2, 2)]
-specials = [(4, 1, "red", -1), (4, 0, "green", 1)]
-cell_scores = {}
+walls = []
+occupied = []
+print("Adding Walls now...")
+for i in range(10):
+    temp_x = randint(0,9)
+    temp_y = randint(0,9)
+    walls.append((temp_x, temp_y))
+    occupied.append((temp_x, temp_y))
+print("Added Walls!")
 
+add_green = False
+add_red = False
+specials = []
+print("Adding Green and Red Cells now...")
+while(not add_green or not add_red):
+    if(not add_green):
+        green_x = randint(0,9)
+        green_y = randint(0,9)
+        if((green_x, green_y) not in occupied):
+            specials.append((green_x, green_y, "green", 1))
+            occupied.append((green_x, green_y))
+            add_green = True
+            print("Added Green!")
+    if(not add_red):
+        red_x = randint(0,9)
+        red_y = randint(0,9)
+        if((red_x, red_y) not in occupied):
+            specials.append((red_x, red_y, "red", -1))
+            occupied.append((red_x, red_y))
+            add_red = True
+            print("Added Red!")
+
+add_player = False
+player_x = 0
+player_y = 0
+print("Adding Player now...")
+while(not add_player):
+    player_x = randint(0,9)
+    player_y = randint(0,9)
+    if((player_x, player_y) not in occupied):
+        player = (player_x, player_y)
+        add_player = True
+        print("Added Player!")
+
+cell_scores = {}
 
 def create_triangle(i, j, action):
     if action == actions[0]:
@@ -59,7 +101,6 @@ def render_grid():
 
 render_grid()
 
-
 def set_cell_score(state, action, val):
     global cell_score_min, cell_score_max
     triangle = cell_scores[state][action]
@@ -76,8 +117,7 @@ def set_cell_score(state, action, val):
 
 def try_move(dx, dy):
     global player, x, y, score, walk_reward, me, restart
-    if restart == True:
-        restart_game()
+    
     new_x = player[0] + dx
     new_y = player[1] + dy
     score += walk_reward
@@ -115,7 +155,7 @@ def call_right(event):
 
 def restart_game():
     global player, score, me, restart
-    player = (0, y-1)
+    player = (player_x, player_y)
     score = 1
     restart = False
     board.coords(me, player[0]*Width+Width*2/10, player[1]*Width+Width*2/10, player[0]*Width+Width*8/10, player[1]*Width+Width*8/10)
