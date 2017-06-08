@@ -1,4 +1,6 @@
-__author__ = 'philippe'
+# Author = Akshat Jain
+# Code based on philippe's code (https://github.com/llSourcell/q_learning_demo)
+
 import World
 import threading
 import time

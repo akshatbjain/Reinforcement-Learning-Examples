@@ -1,4 +1,6 @@
-__author__ = 'philippe'
+# Author = Akshat Jain
+# Code based on philippe's code (https://github.com/llSourcell/q_learning_demo)
+
 from Tkinter import *
 from random import randint
 
@@ -117,7 +119,7 @@ def set_cell_score(state, action, val):
 
 def try_move(dx, dy):
     global player, x, y, score, walk_reward, me, restart
-    
+
     new_x = player[0] + dx
     new_y = player[1] + dy
     score += walk_reward
